@@ -1,0 +1,940 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>The Basics &mdash; Data Refinery 0.1.66 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Data Refinery 0.1.66 documentation" href="index.html"/>
+        <link rel="next" title="Tuple DSL documentation" href="dsl.html"/>
+        <link rel="prev" title="Installation" href="installation.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Data Refinery
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.66
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The Basics</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#field-operations">Field operations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#how-process-errors-in-data">How process errors in data</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#list-of-functions">List of functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#type-enforcer">type_enforcer</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#min-max-normalization">min_max_normalization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#std-score-normalization">std_score_normalization</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#buckets-grouping">buckets_grouping</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#linear-category">linear_category</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#column-category">column_category</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#add-column-prefix">add_column_prefix</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#explode">explode</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#replace-if">replace_if</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#date-parser-time-parser">date_parser - time_parser</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#explode-date-explode-time">explode_date - explode_time</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#remove-columns">remove_columns</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#match-dict">match_dict</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#composing-field-operations">Composing field operations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#normalize-numeric-data">Normalize Numeric Data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#date-data">Date data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#day-to-one-hot-vector">Day to one hot vector</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#event-operations">Event operations</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">List of functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#keep-keep-files">keep - Keep files</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#substitution-value-substitution">substitution - Value Substitution</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#append-append-new-fields">append - Append new fields</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fusion-several-fields-one-output">fusion - several fields one output</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fusion-append-multiple-values-in-multiple-values-out">fusion_append - Multiple values in, multiple values out</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#filter-tuple-discard-irrelevant">filter_tuple - Discard irrelevant</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#alternative-plan-b">alternative - Plan B</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#fail-gracefully">Fail gracefully</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#combine-event-operations">Combine event operations</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#a-world-of-possibilities">A world of possibilities</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#then-adding-new-transformations">Then - Adding new transformations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#peek-take-a-look-at-data">Peek - Take a look at data</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#sequentiality">Sequentiality</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#review-exercises">Review exercises</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dsl.html">Tuple DSL documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="reference.html">Python modules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="glossary.html">Glossary</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Data Refinery</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>The Basics</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/thebasics.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="the-basics">
+<h1>The Basics<a class="headerlink" href="#the-basics" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="field-operations">
+<h2>Field operations<a class="headerlink" href="#field-operations" title="Permalink to this headline">¶</a></h2>
+<p><strong>TODO: explain how we build the operation from field to a complete process</strong></p>
+<p>An ETL process is composed by a group of performed operations on a row and rows are composed by groups of columns.
+So the minimal possible operation is performed on a field.</p>
+<p>Suppose a function is useless on a field V:</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/function.jpg"><img alt="Useless function" src="_images/function.jpg" style="width: 80%;" /></a>
+</div>
+<p>As the process is composed by operations on fields, if we execute this function to a row with one field V, there won’t be output.</p>
+<p>Thus we need an usable function, as example a basic function that keeps value of a field. This function returns the input
+and its name is identity:</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/identity.jpg"><img alt="Identity function" src="_images/identity.jpg" style="width: 80%;" /></a>
+</div>
+<div class="section" id="how-process-errors-in-data">
+<h3>How process errors in data<a class="headerlink" href="#how-process-errors-in-data" title="Permalink to this headline">¶</a></h3>
+<p>One of the most important situations we have to process is errors on data.
+A typical issue is when we expect some field but row doesn’t have it (unstructured data source).</p>
+<p>If any transformation fails we must report precisely without stop the process. All reasons for failure will aggregate by row,
+so the datascientist will have all the issues regarding a row together, and the process will continue with the next row.
+Because of this, field error will not stop the row process, and this one will not stop the dataset process. On production
+environment unexpected data is a common issue, so this data must be logged along their reasons for further
+research and process improvement.</p>
+<p>To fix this problem, Data Refinery transformation functions returns the transformed value and the possible error.
+This situation takes us to three scenes:
+- Function returns a value and no error.
+- Function returns an error and provokes the value doesn’t matter.
+- Function execution is OK, but there is not value.</p>
+<p>In the first case we can use the transformed value.
+In the second one, we don’t care about the value because there is an insuperable error.
+Finally it depends on the current operation, the process rejects the field or fails because there is not value.</p>
+</div>
+<div class="section" id="list-of-functions">
+<h3>List of functions<a class="headerlink" href="#list-of-functions" title="Permalink to this headline">¶</a></h3>
+<p>On data transformation processes, it’s common to transform types or values if a
+condition is triggered, decompose data,..  Data Refinery has defined this kind
+of functions. Furthermore, if it’s necessary we can create our own functions.</p>
+<p>More complex situations can be solved chaining together two or more simple
+functions. This atomic design allows changes on application behaviour with very
+little user effort.</p>
+<p>The majority of ETL’s functions require some context parameters in order to
+produce another, more specialized function. This specialized function can then
+be used to transform the field. This style of operation improves simple
+composition given that all functions will have the same input and output
+instead of a variable number of parameters.</p>
+<div class="section" id="type-enforcer">
+<h4>type_enforcer<a class="headerlink" href="#type-enforcer" title="Permalink to this headline">¶</a></h4>
+<p>Expected function in order to cast the value to a type that can rise a cast exception.</p>
+<p>Sometimes, data source doesn’t contain type or this type is wrong (numbers as string, etc).
+This function use as context a type changer function. If this function raises an error, type enforcer will return None
+and the error message raised.</p>
+<p>For example, if you want to change the data type to integer:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.FieldOperations</span> <span class="kn">import</span> <span class="n">type_enforcer</span>
+
+<span class="n">int_enforcer</span> <span class="o">=</span> <span class="n">type_enforcer</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">int_enforcer</span><span class="p">(</span><span class="s2">&quot;6&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># 6</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="min-max-normalization">
+<h4>min_max_normalization<a class="headerlink" href="#min-max-normalization" title="Permalink to this headline">¶</a></h4>
+<p>Typical operation on machine learning. It consists of interpolate a value between 0 (as minimum) and 1 (as maximum).
+So, this function need a context with the maximum and minimum to run. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.FieldOperations</span> <span class="kn">import</span> <span class="n">min_max_normalization</span>
+
+<span class="n">normalizator</span> <span class="o">=</span> <span class="n">min_max_normalization</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">normalizator</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># 0.5</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="std-score-normalization">
+<h4>std_score_normalization<a class="headerlink" href="#std-score-normalization" title="Permalink to this headline">¶</a></h4>
+<p>Returns the distance of a particular datum …</p>
+<p>This operation represents how far it’s the value from mean, using deviation as scale.</p>
+<p>The function requires two input parameters, the column average and the standard
+deviation. Usage example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.FieldOperations</span> <span class="kn">import</span> <span class="n">std_score_normalization</span>
+
+<span class="n">normalizator</span> <span class="o">=</span> <span class="n">std_score_normalization</span><span class="p">(</span><span class="mi">79</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">normalizator</span><span class="p">(</span><span class="mi">85</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># 0.75</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="buckets-grouping">
+<h4>buckets_grouping<a class="headerlink" href="#buckets-grouping" title="Permalink to this headline">¶</a></h4>
+<p>Transform a lineal numeric value into a categorical one. For instance it can be
+used to group users by age.</p>
+<p>A minimum of one input value is mandatory. This will produce two groups, the
+first one from negative infinity to the given value, and the second one from
+the given value to infinity.</p>
+<p>For example, in order to categorize users into three groups (children, adults
+and elderly) the values 18 and 70 can be passed to the function. This will
+produce the following groups:</p>
+<ol class="arabic simple">
+<li>From negative infinity to 18.</li>
+<li>From 18 to 70.</li>
+<li>From 70 to infinity.</li>
+</ol>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.FieldOperations</span> <span class="kn">import</span> <span class="n">buckets_grouping</span>
+
+<span class="n">group</span> <span class="o">=</span> <span class="n">buckets_grouping</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="mi">70</span><span class="p">)</span>
+<span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">group</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># 1</span>
+<span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">group</span><span class="p">(</span><span class="mi">20</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># 2</span>
+<span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">group</span><span class="p">(</span><span class="mi">73</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># 3</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="linear-category">
+<h4>linear_category<a class="headerlink" href="#linear-category" title="Permalink to this headline">¶</a></h4>
+<p>Translates the textual value of a field into a numeric value given a list of
+possible values.</p>
+<p>The input value is a list of categories. Keep in mind that this list must
+always be in the same order to consistently translate the values.</p>
+<p>The translated value will be the category index of the list.</p>
+<p>As an example, the age can be categorized again, but this time the input a text
+value instead of a numeric one.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.FieldOperations</span> <span class="kn">import</span> <span class="n">linear_category</span>
+
+<span class="n">categorizer</span> <span class="o">=</span> <span class="n">linear_category</span><span class="p">([</span><span class="s2">&quot;niño&quot;</span><span class="p">,</span> <span class="s2">&quot;adulto&quot;</span><span class="p">,</span> <span class="s2">&quot;jubilado&quot;</span><span class="p">])</span>
+<span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">categorizer</span><span class="p">(</span><span class="s2">&quot;adulto&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># 2</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="column-category">
+<h4>column_category<a class="headerlink" href="#column-category" title="Permalink to this headline">¶</a></h4>
+<p>Translates the textual value of a field into a set of columns given a list of
+possible values. A column will be produced by each one of the members of the
+input list. This columns will have a value of <cite>0</cite> by default except for the
+corresponding category that will have a value of <cite>1</cite>. This is known as <em>one hot
+vector</em>.</p>
+<p>Example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.FieldOperations</span> <span class="kn">import</span> <span class="n">column_category</span>
+
+<span class="n">categorizer</span> <span class="o">=</span> <span class="n">column_category</span><span class="p">([</span><span class="s2">&quot;niño&quot;</span><span class="p">,</span> <span class="s2">&quot;adulto&quot;</span><span class="p">,</span> <span class="s2">&quot;jubilado&quot;</span><span class="p">])</span>
+<span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">categorizer</span><span class="p">(</span><span class="s2">&quot;niño&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&quot;niño&quot;: &quot;1&quot;, &quot;adulto&quot;: &quot;0&quot;, &quot;jubilado&quot;: &quot;0&quot;}</span>
+</pre></div>
+</div>
+<p>This operation adds new columns, so is usually used along with an event operation of type [append](##Change it).</p>
+</div>
+<div class="section" id="add-column-prefix">
+<h4>add_column_prefix<a class="headerlink" href="#add-column-prefix" title="Permalink to this headline">¶</a></h4>
+<p>Adds a prefix to the column name. This is useful in a scenario when other
+function generates a new column with the same name of another already existing.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.FieldOperations</span> <span class="kn">import</span> <span class="n">add_column_prefix</span>
+
+<span class="n">prefix</span> <span class="o">=</span> <span class="n">add_column_prefix</span><span class="p">(</span><span class="s2">&quot;good&quot;</span><span class="p">)</span>
+<span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">prefix</span><span class="p">({</span><span class="s2">&quot;one&quot;</span><span class="p">:</span> <span class="s2">&quot;me&quot;</span><span class="p">})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&quot;good_one&quot;: &quot;me&quot;}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="explode">
+<h4>explode<a class="headerlink" href="#explode" title="Permalink to this headline">¶</a></h4>
+<p>Flattens a nested data structure even when is made up by a list of objects.</p>
+<p>In the case of just one inner object, only the original name prefix will be added.</p>
+<p>When multiple objects are present the same prefix will be added and in
+addition, a numerical suffix (starting on 1) fo the second position.</p>
+<p>In this example we exploded the field <cite>name</cite>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.FieldOperations</span> <span class="kn">import</span> <span class="n">explode</span>
+
+<span class="n">explode_name</span> <span class="o">=</span> <span class="n">explode</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span>
+<span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">explode_name</span><span class="p">({</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;first&quot;</span><span class="p">:</span> <span class="s2">&quot;Bob&quot;</span><span class="p">,</span> <span class="s2">&quot;last&quot;</span><span class="p">:</span> <span class="s2">&quot;Dylan&quot;</span><span class="p">}})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&quot;name_first&quot;: &quot;Bob&quot;, &quot;name_last&quot;: &quot;Dylan&quot;}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="replace-if">
+<h4>replace_if<a class="headerlink" href="#replace-if" title="Permalink to this headline">¶</a></h4>
+<p>Replaces a value when some condition fulfilled.</p>
+<p>Two functions are expected, the former should return a boolean value and the
+latter should produce a new value in case of the former function returns
+<cite>True</cite>. Both function will receive the field value.</p>
+<p>As an example, if we want to replace by zero all negative values:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.FieldOperations</span> <span class="kn">import</span> <span class="n">replace_if</span>
+
+<span class="n">change</span> <span class="o">=</span> <span class="n">replace_if</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">0</span><span class="p">)</span>
+<span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">change</span><span class="p">(</span><span class="o">-</span><span class="mi">3</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># 0</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="date-parser-time-parser">
+<h4>date_parser - time_parser<a class="headerlink" href="#date-parser-time-parser" title="Permalink to this headline">¶</a></h4>
+<p>Tries to parse a date with the given list of date formats. If none of the
+formats successfully parses the date then the function returns an error.</p>
+<p>The expected formats are Python standard time formats.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.FieldOperations</span> <span class="kn">import</span> <span class="n">date_parser</span>
+
+<span class="n">parser</span> <span class="o">=</span> <span class="n">date_parser</span><span class="p">([</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">])</span>
+<span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">parser</span><span class="p">(</span><span class="s2">&quot;2017-03-22&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># &lt;datetime class&gt;</span>
+</pre></div>
+</div>
+<p>There is a similar function to format hours, minutes and seconds.</p>
+</div>
+<div class="section" id="explode-date-explode-time">
+<h4>explode_date - explode_time<a class="headerlink" href="#explode-date-explode-time" title="Permalink to this headline">¶</a></h4>
+<p>Transforms a datetime object to a series of columns with numeric values.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">datarefinery.FieldOperations</span> <span class="kn">import</span> <span class="n">explode_date</span>
+
+<span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">explode_date</span><span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">22</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&quot;year&quot;: 2017, &quot;month&quot;: 3, &quot;day&quot;: 22, &quot;hour&quot;:0, &quot;minute&quot;: 0, &quot;second&quot;: 0}</span>
+</pre></div>
+</div>
+<p>If multiple date exists on the event, please consider using the function [add_prefix](###Prefijo de columna). If no all fields are needed the function [remove column](###Quitando columnas) can be used.</p>
+<p>This function is typically used along with <cite>date_parser</cite>.</p>
+</div>
+<div class="section" id="remove-columns">
+<h4>remove_columns<a class="headerlink" href="#remove-columns" title="Permalink to this headline">¶</a></h4>
+<p>Removes one or more columns from a set.</p>
+<p>This function is usually used along with other functions which generate
+multiple columns.</p>
+<p>In case of not require a column, is better just not to operate it. This
+non-operated column will be removed automatically.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleDSL</span> <span class="kn">import</span> <span class="n">compose</span>
+<span class="kn">from</span> <span class="nn">datarefinery.FieldOperations</span> <span class="kn">import</span> <span class="n">explode_date</span><span class="p">,</span> <span class="n">remove_columns</span>
+
+<span class="n">only_year_month</span> <span class="o">=</span> <span class="n">compose</span><span class="p">(</span><span class="n">explode_date</span><span class="p">,</span> <span class="n">remove_columns</span><span class="p">(</span><span class="s2">&quot;day&quot;</span><span class="p">,</span> <span class="s2">&quot;hour&quot;</span><span class="p">,</span> <span class="s2">&quot;minute&quot;</span><span class="p">,</span> <span class="s2">&quot;sencond&quot;</span><span class="p">))</span>
+<span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">only_year_month</span><span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2017</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">22</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&quot;year&quot;: 2017, &quot;month&quot;: 3}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="match-dict">
+<h4>match_dict<a class="headerlink" href="#match-dict" title="Permalink to this headline">¶</a></h4>
+<p>Translates values from a table.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.FieldOperations</span> <span class="kn">import</span> <span class="n">match_dict</span>
+
+<span class="n">d</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Spain&quot;</span><span class="p">:</span> <span class="s2">&quot;ES&quot;</span><span class="p">,</span> <span class="s2">&quot;United States of America&quot;</span><span class="p">:</span> <span class="s2">&quot;US&quot;</span><span class="p">}</span>
+<span class="n">iso_decoder</span> <span class="o">=</span> <span class="n">match_dict</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+<span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">iso_decoder</span><span class="p">(</span><span class="s2">&quot;Spain&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># &quot;ES&quot;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="composing-field-operations">
+<h3>Composing field operations<a class="headerlink" href="#composing-field-operations" title="Permalink to this headline">¶</a></h3>
+<p>This powerful concept from functional programing allow us to build complex
+applications using simple blocks (functions).</p>
+<p>Composition is similar to programming in the sense that a small set of
+operations can be combined to solve a very large set of problems.</p>
+<p>All functions on the library can be combined together using the function
+<cite>combine</cite>.</p>
+<p>This concept is better shown by example.</p>
+<div class="section" id="normalize-numeric-data">
+<h4>Normalize Numeric Data<a class="headerlink" href="#normalize-numeric-data" title="Permalink to this headline">¶</a></h4>
+<p>Convert a numeric string to a numeric format and then normalize using min max approximation.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleDSL</span> <span class="kn">import</span> <span class="n">compose</span>
+<span class="kn">from</span> <span class="nn">datarefinery.FieldOperations</span> <span class="kn">import</span> <span class="n">type_enforcer</span><span class="p">,</span> <span class="n">min_max_normalization</span>
+
+<span class="n">str_2_min_max</span> <span class="o">=</span> <span class="n">compose</span><span class="p">(</span>
+    <span class="n">type_enforcer</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)),</span>
+    <span class="n">min_max_normalization</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">str_2_min_max</span><span class="p">(</span><span class="s2">&quot;50&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># 0.5</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="date-data">
+<h4>Date data<a class="headerlink" href="#date-data" title="Permalink to this headline">¶</a></h4>
+<p>Explode a date is a typical operation too. It keeps year, month and day as data. Furthermore, it adds a prefix to avoid
+problems with other fields.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleDSL</span> <span class="kn">import</span> <span class="n">compose</span>
+<span class="kn">from</span> <span class="nn">datarefinery.FieldOperations</span> <span class="kn">import</span> <span class="n">date_parser</span><span class="p">,</span> <span class="n">explode_date</span><span class="p">,</span> <span class="n">remove_columns</span><span class="p">,</span> <span class="n">add_column_prefix</span>
+
+<span class="n">complete_date</span> <span class="o">=</span> <span class="n">compose</span><span class="p">(</span>
+    <span class="n">date_parser</span><span class="p">([</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">]),</span>
+    <span class="n">explode_date</span><span class="p">,</span>
+    <span class="n">remove_columns</span><span class="p">(</span><span class="s2">&quot;hour&quot;</span><span class="p">,</span> <span class="s2">&quot;minute&quot;</span><span class="p">,</span> <span class="s2">&quot;second&quot;</span><span class="p">),</span>
+    <span class="n">add_column_prefix</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+<span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">complete_date</span><span class="p">(</span><span class="s2">&quot;2017-03-22&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&quot;x_year&quot;: 2017, &quot;x_month&quot;: 3, &quot;x_day&quot;: 22}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="day-to-one-hot-vector">
+<h4>Day to one hot vector<a class="headerlink" href="#day-to-one-hot-vector" title="Permalink to this headline">¶</a></h4>
+<p>This example returns one hot vector using a date string and week days.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleDSL</span> <span class="kn">import</span> <span class="n">compose</span>
+<span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">wrap</span>
+<span class="kn">from</span> <span class="nn">datarefinery.FieldOperations</span> <span class="kn">import</span> <span class="n">date_parser</span><span class="p">,</span> <span class="n">match_dict</span><span class="p">,</span> <span class="n">column_category</span>
+
+<span class="n">week_days</span><span class="o">=</span><span class="p">{</span>
+    <span class="mi">0</span><span class="p">:</span> <span class="s2">&quot;Mo&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="s2">&quot;Tu&quot;</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="s2">&quot;We&quot;</span><span class="p">,</span> <span class="mi">3</span><span class="p">:</span> <span class="s2">&quot;Th&quot;</span><span class="p">,</span> <span class="mi">4</span><span class="p">:</span> <span class="s2">&quot;Fr&quot;</span><span class="p">,</span> <span class="mi">5</span><span class="p">:</span> <span class="s2">&quot;Sa&quot;</span><span class="p">,</span> <span class="mi">6</span><span class="p">:</span> <span class="s2">&quot;Su&quot;</span>
+<span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">day_of_week</span><span class="p">(</span><span class="n">dat</span><span class="p">):</span>
+  <span class="k">return</span> <span class="n">dat</span><span class="o">.</span><span class="n">weekday</span><span class="p">()</span>
+
+<span class="n">day_hot</span> <span class="o">=</span> <span class="n">compose</span><span class="p">(</span>
+    <span class="n">date_parser</span><span class="p">([</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">]),</span>
+    <span class="n">wrap</span><span class="p">(</span><span class="n">day_of_week</span><span class="p">),</span>
+    <span class="n">match_dict</span><span class="p">(</span><span class="n">week_days</span><span class="p">),</span>
+    <span class="n">column_category</span><span class="p">(</span><span class="n">week_days</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+<span class="p">)</span>
+
+<span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">day_hot</span><span class="p">(</span><span class="s2">&quot;2017-10-19&quot;</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&quot;Mo&quot;: 0, &quot;Tu&quot;: 0, &quot;We&quot;: 0, &quot;Th&quot;: 1, &quot;Fr&quot;: 0, &quot;Sa&quot;: 0, &quot;Su&quot;: 0}</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="event-operations">
+<h2>Event operations<a class="headerlink" href="#event-operations" title="Permalink to this headline">¶</a></h2>
+<p>Field functions has no affect on the row, so we need Event functions; maybe we need to change the value of a field; or
+maybe create a new field.
+Field functions has different interface. They receives the input, the accumulated output until this point and the error.
+Every Field function also returns the same, because of this we can compose all functions together in one bigger function.</p>
+<p>The Field function has total control over the transformation step, and can affect to the full row, even fields already
+changed by other field functions. Because of this responsibility it’s better using the supplied functions, but you can
+build your own.</p>
+<div class="section" id="id1">
+<h3>List of functions<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="keep-keep-files">
+<h4>keep - Keep files<a class="headerlink" href="#keep-keep-files" title="Permalink to this headline">¶</a></h4>
+<p>Keep is the simplest operation, no need of any field function. In essence take the value of a field from the input and
+put it on the output without change neither the value nor the name of field.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">keep</span>
+
+<span class="n">operation</span> <span class="o">=</span> <span class="n">keep</span><span class="p">([</span><span class="s2">&quot;greet&quot;</span><span class="p">])</span>
+<span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">operation</span><span class="p">({</span><span class="s2">&quot;greet&quot;</span><span class="p">:</span> <span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="s2">&quot;who&quot;</span><span class="p">:</span> <span class="s2">&quot;world&quot;</span><span class="p">},</span> <span class="p">{},</span> <span class="p">{})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&quot;greet&quot;: &quot;hello&quot;}</span>
+</pre></div>
+</div>
+<p>If you need keep several similar fields you can use keep_regexp.</p>
+</div>
+<div class="section" id="substitution-value-substitution">
+<h4>substitution - Value Substitution<a class="headerlink" href="#substitution-value-substitution" title="Permalink to this headline">¶</a></h4>
+<p>The next operation change the value of a field with the supplied field function. This function will not change the
+name of the field. By example, given a to_float function, you can do this:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">wrap</span><span class="p">,</span> <span class="n">substitution</span>
+
+<span class="n">operation</span> <span class="o">=</span> <span class="n">substitution</span><span class="p">([</span><span class="s2">&quot;greet&quot;</span><span class="p">],</span> <span class="n">wrap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+<span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">operation</span><span class="p">({</span><span class="s2">&quot;greet&quot;</span><span class="p">:</span> <span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="s2">&quot;who&quot;</span><span class="p">:</span> <span class="s2">&quot;world&quot;</span><span class="p">},</span> <span class="p">{},</span> <span class="p">{})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&quot;greet&quot;: 5}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="append-append-new-fields">
+<h4>append - Append new fields<a class="headerlink" href="#append-append-new-fields" title="Permalink to this headline">¶</a></h4>
+<p>Usually we need add new field or change the name of the field. We can use append to do this, but it expects a
+field function that return a python dictionary, where every key will be a new field. By example, given a len_cap function that
+will return the len of a string and the first letter in uppercase:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">wrap</span><span class="p">,</span> <span class="n">append</span>
+
+<span class="n">operation</span> <span class="o">=</span> <span class="n">append</span><span class="p">([</span><span class="s2">&quot;greet&quot;</span><span class="p">],</span> <span class="n">wrap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="s2">&quot;you&quot;</span><span class="p">,</span> <span class="s2">&quot;y&quot;</span><span class="p">:</span> <span class="s2">&quot;None&quot;</span><span class="p">}))</span>
+<span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">operation</span><span class="p">({</span><span class="s2">&quot;greet&quot;</span><span class="p">:</span> <span class="s2">&quot;hello&quot;</span><span class="p">,</span> <span class="s2">&quot;who&quot;</span><span class="p">:</span> <span class="s2">&quot;world&quot;</span><span class="p">},</span> <span class="p">{},</span> <span class="p">{})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&#39;hello&#39;: &#39;you&#39;, &#39;y&#39;: &#39;None&#39;}</span>
+</pre></div>
+</div>
+<p>Notice that the field “greet” it’s not in the output. Append only add the result of the function, and the function has no
+“greet” in their output.</p>
+</div>
+<div class="section" id="fusion-several-fields-one-output">
+<h4>fusion - several fields one output<a class="headerlink" href="#fusion-several-fields-one-output" title="Permalink to this headline">¶</a></h4>
+<p>We already define functions to change the values and add more than one field to the output. But also we can create one
+field from several inputs.</p>
+<p>This function it’s complex, and we have several scenarios. Also need the name of the new field.
+By example we can sum several numeric fields into total field.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">wrap</span><span class="p">,</span> <span class="n">fusion</span>
+
+<span class="n">operation</span> <span class="o">=</span> <span class="n">fusion</span><span class="p">([</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">],</span> <span class="s2">&quot;sum_abc&quot;</span><span class="p">,</span> <span class="n">wrap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)))</span>
+<span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">operation</span><span class="p">({</span><span class="s2">&quot;a&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;b&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;c&quot;</span><span class="p">:</span> <span class="mi">3</span><span class="p">},</span> <span class="p">{},</span> <span class="p">{})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&#39;sum_abc&#39;: 6}</span>
+</pre></div>
+</div>
+<p>But we can perform some decision with the input fields. Suppose that you need to change the value of money amount
+field by currency code field. But functions receive only one parameter input, so fusion will put all the values in
+a list as the input, in the same order that you request in fields field.
+Knowing that, we can decompose the list into the fields that we need.</p>
+<p>By example, given a function to_eur that convert any currency into EUR:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">to_eur_wrapped</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+  <span class="p">[</span><span class="n">currency</span><span class="p">,</span> <span class="n">value</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+  <span class="k">return</span> <span class="n">to_eur</span><span class="p">(</span><span class="n">currency</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We can use this way with fusion:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">wrap</span><span class="p">,</span> <span class="n">fusion</span>
+
+<span class="n">val_eur_op</span> <span class="o">=</span> <span class="n">fusion</span><span class="p">([</span><span class="s2">&quot;currency&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">],</span> <span class="s2">&quot;val_eur&quot;</span><span class="p">,</span> <span class="n">wrap</span><span class="p">(</span><span class="n">to_eur_wrapped</span><span class="p">))</span>
+<span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">val_eur_op</span><span class="p">({</span><span class="s2">&quot;currency&quot;</span><span class="p">:</span> <span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&quot;val_eur&quot;: 0.8459}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="fusion-append-multiple-values-in-multiple-values-out">
+<h4>fusion_append - Multiple values in, multiple values out<a class="headerlink" href="#fusion-append-multiple-values-in-multiple-values-out" title="Permalink to this headline">¶</a></h4>
+<p>In fact it’s the same that a fusion, but expect that the field function returns a python dict, in the same way than
+append function.</p>
+<p>We can perform the same example that fusion but we can generate new fields with the currency as name of field and
+the money value as value:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">wrap</span><span class="p">,</span> <span class="n">fusion_append</span>
+
+<span class="k">def</span> <span class="nf">to_eur_cols</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+  <span class="p">[</span><span class="n">currency</span><span class="p">,</span> <span class="n">value</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
+  <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;EUR&quot;</span><span class="p">:</span> <span class="n">to_eur</span><span class="p">(</span><span class="n">currency</span><span class="p">,</span> <span class="n">value</span><span class="p">),</span> <span class="n">currency</span><span class="p">:</span> <span class="n">value</span><span class="p">}</span>
+
+<span class="n">val_eur_op</span> <span class="o">=</span> <span class="n">fusion_append</span><span class="p">([</span><span class="s2">&quot;currency&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">],</span> <span class="s2">&quot;val_eur&quot;</span><span class="p">,</span> <span class="n">wrap</span><span class="p">(</span><span class="n">to_eur_cols</span><span class="p">))</span>
+<span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">val_eur_op</span><span class="p">({</span><span class="s2">&quot;currency&quot;</span><span class="p">:</span> <span class="s2">&quot;USD&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&quot;EUR&quot;: 0.8459, &quot;USD&quot;: 1}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="filter-tuple-discard-irrelevant">
+<h4>filter_tuple - Discard irrelevant<a class="headerlink" href="#filter-tuple-discard-irrelevant" title="Permalink to this headline">¶</a></h4>
+<p>When we don’t need all data, the best approach it’s discard as soon as possible the rows that we don’t need.</p>
+<p>With no_none function and filter field operation the genearted function will return None as result if the event
+it’s discarded:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">wrap</span><span class="p">,</span> <span class="n">filter_tuple</span>
+
+<span class="n">no_none</span> <span class="o">=</span> <span class="n">filter_tuple</span><span class="p">([</span><span class="s2">&quot;value&quot;</span><span class="p">],</span> <span class="n">wrap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">))</span>
+
+<span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">no_none</span><span class="p">({</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="bp">None</span><span class="p">})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># None</span>
+</pre></div>
+</div>
+<p>It’s up to you not to fail when result it’s None, if no error means that event is discarded.</p>
+</div>
+<div class="section" id="alternative-plan-b">
+<h4>alternative - Plan B<a class="headerlink" href="#alternative-plan-b" title="Permalink to this headline">¶</a></h4>
+<p>Some times we have several ways to transform the event. If the first approach fail, alternative will try the
+next, until success or the last fail.</p>
+<p>Suppose that you want to multiply by two, but if this operation fail, you want to append value 0.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">wrap</span><span class="p">,</span> <span class="n">alternative</span><span class="p">,</span> <span class="n">substitution</span><span class="p">,</span> <span class="n">append</span>
+
+<span class="n">need_value</span> <span class="o">=</span> <span class="n">alternative</span><span class="p">(</span>
+    <span class="n">substitution</span><span class="p">([</span><span class="s2">&quot;value&quot;</span><span class="p">],</span> <span class="n">wrap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span><span class="p">)),</span>
+    <span class="n">append</span><span class="p">([</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">wrap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}))</span>
+<span class="p">)</span>
+<span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">need_value</span><span class="p">({</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&quot;value&quot;: 0}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="fail-gracefully">
+<h4>Fail gracefully<a class="headerlink" href="#fail-gracefully" title="Permalink to this headline">¶</a></h4>
+<p>When error occurs, at any point, we don’t stop the process; keep in mind this principle when you develop your own functions. Instead exceptions we try to explain what it’s going on, the deeper the better.
+This allow us to perform a recovery from fail as one of last steps. The recovery function search the field in error, write to the output with the provided function and if it’s succsesful remove the error.</p>
+<p>Remember that params to the no_error function are input, ouput and error.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">wrap</span><span class="p">,</span> <span class="n">recover</span>
+
+<span class="n">no_error</span> <span class="o">=</span> <span class="n">recover</span><span class="p">([</span><span class="s2">&quot;value&quot;</span><span class="p">],</span> <span class="n">wrap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="mi">0</span><span class="p">))</span>
+<span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">no_error</span><span class="p">({},{},{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="s2">&quot;not found&quot;</span><span class="p">})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&quot;value&quot;: 0}</span>
+<span class="k">print</span><span class="p">(</span><span class="n">err</span><span class="p">)</span> <span class="c1"># {}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="combine-event-operations">
+<h3>Combine event operations<a class="headerlink" href="#combine-event-operations" title="Permalink to this headline">¶</a></h3>
+<p>Normally, a transformation is a group of different type of functions, not only one type. For example, you want to keep
+some fields and change the value of a field using a function.</p>
+<p>So that’s why we need an interface for doing this kind of transformations. Data Refinery has an object that wraps event
+operations and exposes the methods. This object is <em>Tr</em>.</p>
+<p>The most important methods are <em>then</em> and <em>apply</em>. <em>then</em> returns a new <em>Tr</em> object which contains last operations plus
+the operation was passed as argument with <em>then</em>.
+When we have all needed operations, we need to have a function to transform data. For this case, we use <em>apply</em>.
+This function returns a function that contains all operations and has the same interface that a row operation.</p>
+<p>For example, if we want to keep a field and replace another field value with a x2 function (multiply by two):</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">wrap</span><span class="p">,</span> <span class="n">keep</span><span class="p">,</span> <span class="n">substitution</span>
+<span class="kn">from</span> <span class="nn">datarefinery.Tr</span> <span class="kn">import</span> <span class="n">Tr</span>
+
+<span class="n">x2</span> <span class="o">=</span> <span class="n">wrap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">tr</span> <span class="o">=</span> <span class="n">Tr</span><span class="p">(</span><span class="n">keep</span><span class="p">([</span><span class="s2">&quot;name&quot;</span><span class="p">]))</span><span class="o">.</span><span class="n">then</span><span class="p">(</span><span class="n">substitution</span><span class="p">([</span><span class="s2">&quot;value&quot;</span><span class="p">],</span> <span class="n">x2</span><span class="p">))</span>
+<span class="n">operation</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
+<span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">operation</span><span class="p">({</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;John&quot;</span><span class="p">,</span> <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&quot;name&quot;: &quot;John&quot;, &quot;value&quot;: 20}</span>
+</pre></div>
+</div>
+<p>There are common mistakes as:
+- Add arguments to <em>apply</em>. This function only returns the complete function to use at the event.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">substitution</span>
+
+<span class="n">tr</span> <span class="o">=</span> <span class="n">Tr</span><span class="p">(</span><span class="n">keep</span><span class="p">([</span><span class="s2">&quot;name&quot;</span><span class="p">]))</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">substitution</span><span class="p">([</span><span class="s2">&quot;value&quot;</span><span class="p">],</span> <span class="n">x2</span><span class="p">))</span> <span class="c1"># WRONG!!!</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li>Use directly the function with parenthesis as argument (the argument is the function result without parameters):</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">substitution</span>
+<span class="kn">from</span> <span class="nn">datarefinery.Tr</span> <span class="kn">import</span> <span class="n">Tr</span>
+
+<span class="n">tr</span> <span class="o">=</span> <span class="n">Tr</span><span class="p">(</span><span class="n">keep</span><span class="p">([</span><span class="s2">&quot;name&quot;</span><span class="p">]))</span><span class="o">.</span><span class="n">then</span><span class="p">(</span><span class="n">substitution</span><span class="p">([</span><span class="s2">&quot;value&quot;</span><span class="p">],</span> <span class="n">x2</span><span class="p">()))</span> <span class="c1"># WRONG!!!</span>
+</pre></div>
+</div>
+<p>In this case, we need a function as argument (the reference to the function).</p>
+<p>This should be carefully used, in Data Refinery some functions receives data parameters (as min_max_normalization) and
+returns a function as result and other (as explode_date) use functions as parameters.</p>
+<div class="section" id="a-world-of-possibilities">
+<h4>A world of possibilities<a class="headerlink" href="#a-world-of-possibilities" title="Permalink to this headline">¶</a></h4>
+<p>We can save our set of transformations every time we want using <em>Tr</em> object. This is very useful when you have training
+and production data.</p>
+<p>Training data is often as production data, but it contains an extra field called “label”. This field indicates what
+machine learning model must learn.</p>
+<p>In next example, data transformation is a specified module of your application. You can get it with <em>etl</em> function.
+Then we will add the label logic:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">keep</span>
+
+<span class="n">tr</span> <span class="o">=</span> <span class="n">etl</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">training</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="n">tr</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">then</span><span class="p">(</span><span class="n">keep</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">))</span>
+<span class="n">operation</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>By this way, the output will contain the label without knowing other transformations over the data during training phase.</p>
+</div>
+<div class="section" id="then-adding-new-transformations">
+<h4>Then - Adding new transformations<a class="headerlink" href="#then-adding-new-transformations" title="Permalink to this headline">¶</a></h4>
+<p>Data Refinery only works with Python dictionaries. So when data is not a dictionary, it’s useful to use a data format
+operation before the event.
+<em>Tr</em> interface has a function to do this: <em>init</em>. This function takes the specified function and puts it at first on
+the group of event operations.</p>
+<p>At datarefinery.tuple.Formats module you can find several functions to transform different formats to Python
+dictionaries. In addition, there is a function <em>reader</em> to read the data. It’s an alias for <em>init</em>.</p>
+<p>Note: if you want to use <em>init</em> with different <em>Tr</em> objects, be aware if this objects have the same origin, you
+will change both.</p>
+<p><strong>TODO: draw origin transformations</strong></p>
+<p>For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">keep</span>
+<span class="kn">from</span> <span class="nn">datarefinery.tuple.Formats</span> <span class="kn">import</span> <span class="n">from_json</span>
+
+<span class="n">step1</span> <span class="o">=</span> <span class="n">etl</span><span class="p">()</span>
+<span class="n">step2</span> <span class="o">=</span> <span class="n">step1</span><span class="o">.</span><span class="n">then</span><span class="p">(</span><span class="n">keep</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">))</span>
+<span class="n">final</span> <span class="o">=</span> <span class="n">step2</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">from_json</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>In this case, step1 and step2 have <em>from_json</em> operation at beginning. If you want different starts for every step, then
+you can use the next code as example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">keep</span>
+<span class="kn">from</span> <span class="nn">datarefinery.tuple.Formats</span> <span class="kn">import</span> <span class="n">from_json</span>
+
+<span class="n">step1</span> <span class="o">=</span> <span class="n">etl</span><span class="p">()</span>
+<span class="n">step2</span> <span class="o">=</span> <span class="n">etl</span><span class="p">()</span><span class="o">.</span><span class="n">then</span><span class="p">(</span><span class="n">keep</span><span class="p">(</span><span class="s2">&quot;label&quot;</span><span class="p">))</span>
+<span class="n">final</span> <span class="o">=</span> <span class="n">step2</span><span class="o">.</span><span class="n">init</span><span class="p">(</span><span class="n">from_json</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="peek-take-a-look-at-data">
+<h4>Peek - Take a look at data<a class="headerlink" href="#peek-take-a-look-at-data" title="Permalink to this headline">¶</a></h4>
+<p><em>peek</em> function works to read and handle data without any modification. You can use it when its needed to save data
+in a intermediate step without any transformation.</p>
+<p>Keep in mind <em>peek</em> is invoked when <em>apply</em> is. Furthermore, the execution of the complete process is synchronous. In
+other words, the process doesn’t finish until <em>peek</em> doesn’t finish (process continues even when <em>peek</em> fails).</p>
+<p>Note: <em>writer</em> method is an alias for <em>peek</em>.</p>
+</div>
+<div class="section" id="sequentiality">
+<h4>Sequentiality<a class="headerlink" href="#sequentiality" title="Permalink to this headline">¶</a></h4>
+<p>When you use <em>then</em> to create a group of operations, these are executed in one step. In other words, all operations use
+the same input and write in the same output. So, if we want to modify the value of a field which have been modified yet,
+even using <em>then</em>, all operations take place at the same time and we only see the last transformation.</p>
+<p>For example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">wrap</span><span class="p">,</span> <span class="n">substitution</span>
+<span class="kn">from</span> <span class="nn">datarefinery.Tr</span> <span class="kn">import</span> <span class="n">Tr</span>
+
+<span class="n">x2</span> <span class="o">=</span> <span class="n">wrap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">tr</span> <span class="o">=</span> <span class="n">Tr</span><span class="p">(</span><span class="n">substitution</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">x2</span><span class="p">))</span><span class="o">.</span><span class="n">then</span><span class="p">(</span><span class="n">substitution</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">x2</span><span class="p">))</span>
+<span class="n">operation</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
+<span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">operation</span><span class="p">({</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&quot;value&quot;: 4}</span>
+</pre></div>
+</div>
+<p>In this example, you expect output value will be 8, but it’s not true. When operations run in parallel, the execution is
+something like this:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="19%" />
+<col width="42%" />
+<col width="40%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">input</th>
+<th class="head">value (1st time)</th>
+<th class="head">value(2nd time)</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>2</td>
+<td>4</td>
+<td>4</td>
+</tr>
+</tbody>
+</table>
+<p>The input is the same for both operations and the output of the first operation was overwritten by the second one.</p>
+<p>If you want to do different operations on the same value field, then you have to use <em>compose</em>. This function lets
+operations run sequentially, as the next example:</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">wrap</span><span class="p">,</span> <span class="n">substitution</span><span class="p">,</span> <span class="n">compose</span>
+<span class="kn">from</span> <span class="nn">datarefinery.Tr</span> <span class="kn">import</span> <span class="n">Tr</span>
+
+<span class="n">x2</span> <span class="o">=</span> <span class="n">wrap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">tr</span> <span class="o">=</span> <span class="n">Tr</span><span class="p">(</span><span class="n">substitution</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">compose</span><span class="p">(</span><span class="n">x2</span><span class="p">,</span><span class="n">x2</span><span class="p">)))</span>
+<span class="n">operation</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
+<span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">operation</span><span class="p">({</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&quot;value&quot;: 8}</span>
+</pre></div>
+</div>
+<p>There is an alternative option for doing this. <em>change</em> is a function which uses the value of the output and substitutes
+the output with the result.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">wrap</span><span class="p">,</span> <span class="n">substitution</span><span class="p">,</span> <span class="n">change</span>
+<span class="kn">from</span> <span class="nn">datarefinery.Tr</span> <span class="kn">import</span> <span class="n">Tr</span>
+
+<span class="n">x2</span> <span class="o">=</span> <span class="n">wrap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">tr</span> <span class="o">=</span> <span class="n">Tr</span><span class="p">(</span><span class="n">substitution</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">x2</span><span class="p">))</span><span class="o">.</span><span class="n">then</span><span class="p">(</span><span class="n">change</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">x2</span><span class="p">))</span>
+<span class="n">operation</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
+<span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">operation</span><span class="p">({</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&quot;value&quot;: 8}</span>
+</pre></div>
+</div>
+<p>You can create your own operation using our DSL.</p>
+<p>Other option is use <em>chain</em> function. This ends all operations before its execution and copy the output to the input.
+In other words, the original input disappears but you can propagate the error.</p>
+<div class="highlight-python"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datarefinery.tuple.TupleOperations</span> <span class="kn">import</span> <span class="n">wrap</span><span class="p">,</span> <span class="n">substitution</span><span class="p">,</span> <span class="n">chain</span>
+<span class="kn">from</span> <span class="nn">datarefinery.Tr</span> <span class="kn">import</span> <span class="n">Tr</span>
+
+<span class="n">x2</span> <span class="o">=</span> <span class="n">wrap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">*</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">tr</span> <span class="o">=</span> <span class="n">Tr</span><span class="p">(</span><span class="n">substitution</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">x2</span><span class="p">))</span><span class="o">.</span><span class="n">then</span><span class="p">(</span><span class="n">chain</span><span class="p">)</span><span class="o">.</span><span class="n">then</span><span class="p">(</span><span class="n">substitution</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">,</span> <span class="n">x2</span><span class="p">))</span>
+<span class="n">operation</span> <span class="o">=</span> <span class="n">tr</span><span class="o">.</span><span class="n">apply</span><span class="p">()</span>
+<span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">res</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span> <span class="o">=</span> <span class="n">operation</span><span class="p">({</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">})</span>
+<span class="k">print</span><span class="p">(</span><span class="n">res</span><span class="p">)</span> <span class="c1"># {&quot;value&quot;: 8}</span>
+</pre></div>
+</div>
+<p>Please, use <em>chain</em> as last option. It’s a <strong>very dangerous</strong> operation, because it <strong>loses the original input</strong>.
+This means if you have to do operations with original input, you can’t do it after <em>chain</em> operation.</p>
+</div>
+</div>
+</div>
+<div class="section" id="review-exercises">
+<h2>Review exercises<a class="headerlink" href="#review-exercises" title="Permalink to this headline">¶</a></h2>
+<p>If you want or need to do basic exercises for review all your knowledge, you can execute the next notebook on your
+Jupyter instance: <a class="reference external" href="https://github.com/BBVA/data-refinery/blob/master/docs/notebooks/thebasics.ipynb">thebasics.ipynb</a>.</p>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dsl.html" class="btn btn-neutral float-right" title="Tuple DSL documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="installation.html" class="btn btn-neutral" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, BBVA-Labs.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.66',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
