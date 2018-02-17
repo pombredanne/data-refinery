@@ -96,7 +96,7 @@ So, this function need a context with the maximum and minimum to run. For exampl
 
     normalizator = min_max_normalization(1, 10)
     (res, err) = normalizator(5)
-    print(res) # 0.5
+    print(res) # 0.4444444444444444
 
 
 std_score_normalization
@@ -189,7 +189,7 @@ Example:
 
     categorizer = column_category(["niño", "adulto", "jubilado"])
     (res, err) = categorizer("niño")
-    print(res) # {"niño": "1", "adulto": "0", "jubilado": "0"}
+    print(res) # OrderedDict([('niño', 1), ('adulto', 0), ('jubilado', 0)])
 
 This operation adds new columns, so is usually used along with an event operation of type [append](##Change it).
 
@@ -224,8 +224,9 @@ In this example we exploded the field `name`:
 .. code-block:: python
 
     from datarefinery.FieldOperations import explode
+    from datarefinery.TupleOperations import append
 
-    explode_name = explode("name")
+    explode_name = append(["name"], explode("name"))
     (res, err) = explode_name({"name": {"first": "Bob", "last": "Dylan"}})
     print(res) # {"name_first": "Bob", "name_last": "Dylan"}
 
@@ -260,7 +261,7 @@ The expected formats are Python standard time formats.
 
 .. code-block:: python
 
-    from datarefinery.FieldOperations import date_parser
+    from datarefinery.DateFieldOperations import date_parser
 
     parser = date_parser(["%Y-%m-%d"])
     (res, err) = parser("2017-03-22")
@@ -276,8 +277,8 @@ Transforms a datetime object to a series of columns with numeric values.
 
 .. code-block:: python
 
-    import datetime
-    from datarefinery.FieldOperations import explode_date
+    from datetime import datetime
+    from datarefinery.DateFieldOperations import explode_date
 
     (res, err) = explode_date(datetime(2017,3,22))
     print(res) # {"year": 2017, "month": 3, "day": 22, "hour":0, "minute": 0, "second": 0}
@@ -300,11 +301,12 @@ non-operated column will be removed automatically.
 
 .. code-block:: python
 
-    import datetime
+    from datetime import datetime
     from datarefinery.tuple.TupleDSL import compose
-    from datarefinery.FieldOperations import explode_date, remove_columns
+    from datarefinery.DateFieldOperations import explode_date
+    from datarefinery.FieldOperations import remove_columns
 
-    only_year_month = compose(explode_date, remove_columns("day", "hour", "minute", "sencond"))
+    only_year_month = compose(explode_date, remove_columns("day", "hour", "minute", "second"))
     (res, err) = only_year_month(datetime(2017,3,22))
     print(res) # {"year": 2017, "month": 3}
 
@@ -367,7 +369,8 @@ problems with other fields.
 .. code-block:: python
 
     from datarefinery.tuple.TupleDSL import compose
-    from datarefinery.FieldOperations import date_parser, explode_date, remove_columns, add_column_prefix
+    from datarefinery.FieldOperations import remove_columns, add_column_prefix
+    from datarefinery.DateFieldOperations import date_parser, explode_date
 
     complete_date = compose(
         date_parser(["%Y-%m-%d"]),
@@ -387,8 +390,9 @@ This example returns one hot vector using a date string and week days.
 .. code-block:: python
 
     from datarefinery.tuple.TupleDSL import compose
-    from datarefinery.tuple.TupleOperations import wrap
-    from datarefinery.FieldOperations import date_parser, match_dict, column_category
+    from datarefinery.TupleOperations import wrap
+    from datarefinery.FieldOperations import match_dict, column_category
+    from datarefinery.DateFieldOperations import date_parser
 
     week_days={
         0: "Mo", 1: "Tu", 2: "We", 3: "Th", 4: "Fr", 5: "Sa", 6: "Su"
@@ -405,55 +409,51 @@ This example returns one hot vector using a date string and week days.
     )
 
     (res, err) = day_hot("2017-10-19")
-    print(res) # {"Mo": 0, "Tu": 0, "We": 0, "Th": 1, "Fr": 0, "Sa": 0, "Su": 0}
+    print(res) # OrderedDict([('Mo', 0), ('Tu', 0), ('We', 0), ('Th', 1), ('Fr', 0), ('Sa', 0), ('Su', 0)])
 
 Event operations
 ----------------
 
 Field functions has no affect on the row, so we need Event functions; maybe we need to change the value of a field; or
 maybe create a new field.
-Field functions has different interface. They receives the input, the accumulated output until this point and the error.
-Every Field function also returns the same, because of this we can compose all functions together in one bigger function.
-
-The Field function has total control over the transformation step, and can affect to the full row, even fields already
-changed by other field functions. Because of this responsibility it's better using the supplied functions, but you can
-build your own.
+Field functions has the same interface. They receives the input, and return result and error.
+Think in this functions as a tools for dictionaries.
 
 List of functions
 ~~~~~~~~~~~~~~~~~
 
 keep - Keep files
-...........
+.................
 
 Keep is the simplest operation, no need of any field function. In essence take the value of a field from the input and
 put it on the output without change neither the value nor the name of field.
 
 .. code-block:: python
 
-    from datarefinery.tuple.TupleOperations import keep
+    from datarefinery.TupleOperations import keep
 
     operation = keep(["greet"])
-    (inp, res, err) = operation({"greet": "hello", "who": "world"}, {}, {})
+    (res, err) = operation({"greet": "hello", "who": "world"}, {})
     print(res) # {"greet": "hello"}
 
 If you need keep several similar fields you can use keep_regexp.
 
 substitution - Value Substitution
-..................
+.................................
 
 The next operation change the value of a field with the supplied field function. This function will not change the
 name of the field. By example, given a to_float function, you can do this:
 
 .. code-block:: python
 
-    from datarefinery.tuple.TupleOperations import wrap, substitution
+    from datarefinery.TupleOperations import wrap, substitution
 
     operation = substitution(["greet"], wrap(lambda x: len(x)))
-    (inp, res, err) = operation({"greet": "hello", "who": "world"}, {}, {})
+    (res, err) = operation({"greet": "hello", "who": "world"}, {})
     print(res) # {"greet": 5}
 
 append - Append new fields
-.................
+..........................
 
 Usually we need add new field or change the name of the field. We can use append to do this, but it expects a
 field function that return a python dictionary, where every key will be a new field. By example, given a len_cap function that
@@ -461,10 +461,10 @@ will return the len of a string and the first letter in uppercase:
 
 .. code-block:: python
 
-    from datarefinery.tuple.TupleOperations import wrap, append
+    from datarefinery.TupleOperations import wrap, append
 
     operation = append(["greet"], wrap(lambda x: {x: "you", "y": "None"}))
-    (inp, res, err) = operation({"greet": "hello", "who": "world"}, {}, {})
+    (res, err) = operation({"greet": "hello", "who": "world"}, {})
     print(res) # {'hello': 'you', 'y': 'None'}
 
 Notice that the field "greet" it's not in the output. Append only add the result of the function, and the function has no
@@ -481,10 +481,10 @@ By example we can sum several numeric fields into total field.
 
 .. code-block:: python
 
-    from datarefinery.tuple.TupleOperations import wrap, fusion
+    from datarefinery.TupleOperations import wrap, fusion
 
     operation = fusion(["a", "b", "c"], "sum_abc", wrap(lambda x: sum(x)))
-    (inp, res, err) = operation({"a": 1, "b": 2, "c": 3}, {}, {})
+    (res, err) = operation({"a": 1, "b": 2, "c": 3}, {})
     print(res) # {'sum_abc': 6}
 
 But we can perform some decision with the input fields. Suppose that you need to change the value of money amount
@@ -504,10 +504,10 @@ We can use this way with fusion:
 
 .. code-block:: python
 
-    from datarefinery.tuple.TupleOperations import wrap, fusion
+    from datarefinery.TupleOperations import wrap, fusion
 
     val_eur_op = fusion(["currency", "value"], "val_eur", wrap(to_eur_wrapped))
-    (inp, res, err) = val_eur_op({"currency": "USD", "value": 1})
+    (res, err) = val_eur_op({"currency": "USD", "value": 1})
     print(res) # {"val_eur": 0.8459}
 
 fusion_append - Multiple values in, multiple values out
@@ -521,14 +521,14 @@ the money value as value:
 
 .. code-block:: python
 
-    from datarefinery.tuple.TupleOperations import wrap, fusion_append
+    from datarefinery.TupleOperations import wrap, fusion_append
 
     def to_eur_cols(x):
       [currency, value] = x
       return {"EUR": to_eur(currency, value), currency: value}
 
     val_eur_op = fusion_append(["currency", "value"], "val_eur", wrap(to_eur_cols))
-    (inp, res, err) = val_eur_op({"currency": "USD", "value": 1})
+    (res, err) = val_eur_op({"currency": "USD", "value": 1})
     print(res) # {"EUR": 0.8459, "USD": 1}
 
 filter_tuple - Discard irrelevant
@@ -541,11 +541,11 @@ it's discarded:
 
 .. code-block:: python
 
-    from datarefinery.tuple.TupleOperations import wrap, filter_tuple
+    from datarefinery.TupleOperations import wrap, filter_tuple
 
     no_none = filter_tuple(["value"], wrap(lambda x: x is not None))
 
-    (inp, res, err) = no_none({"value": None})
+    (res, err) = no_none({"value": None})
     print(res) # None
 
 It's up to you not to fail when result it's None, if no error means that event is discarded.
@@ -560,87 +560,47 @@ Suppose that you want to multiply by two, but if this operation fail, you want t
 
 .. code-block:: python
 
-    from datarefinery.tuple.TupleOperations import wrap, alternative, substitution, append
+    from datarefinery.TupleOperations import wrap, alternative, substitution, append
 
     need_value = alternative(
         substitution(["value"], wrap(lambda x: x*2)),
         append(["name"], wrap(lambda x: {"value": 0}))
     )
-    (inp, res, err) = need_value({"name": "John"})
+    (res, err) = need_value({"name": "John"})
     print(res) # {"value": 0}
 
-Fail gracefully
-...............
-
-When error occurs, at any point, we don't stop the process; keep in mind this principle when you develop your own functions. Instead exceptions we try to explain what it's going on, the deeper the better.
-This allow us to perform a recovery from fail as one of last steps. The recovery function search the field in error, write to the output with the provided function and if it's succsesful remove the error.
-
-Remember that params to the no_error function are input, ouput and error.
-
-.. code-block:: python
-
-    from datarefinery.tuple.TupleOperations import wrap, recover
-
-    no_error = recover(["value"], wrap(lambda x: 0))
-    (inp, res, err) = no_error({},{},{"value": "not found"})
-    print(res) # {"value": 0}
-    print(err) # {}
 
 Combine event operations
 ~~~~~~~~~~~~~~~~~~~~~~~~
 Normally, a transformation is a group of different type of functions, not only one type. For example, you want to keep
 some fields and change the value of a field using a function.
 
-So that's why we need an interface for doing this kind of transformations. Data Refinery has an object that wraps event
-operations and exposes the methods. This object is *Tr*.
+So that's why we need an interface for doing this kind of transformations. Data Refinery has two functions to perform
+this kind of work: parallel and sequential.
 
-The most important methods are *then* and *apply*. *then* returns a new *Tr* object which contains last operations plus
-the operation was passed as argument with *then*.
-When we have all needed operations, we need to have a function to transform data. For this case, we use *apply*.
-This function returns a function that contains all operations and has the same interface that a row operation.
+With sequential you can perform transformations that affect the same data several times, like, generate two new fields
+and then sum together.
+
+With parallel you can change several fields using the same input and with no interactions between them.
 
 For example, if we want to keep a field and replace another field value with a x2 function (multiply by two):
 
 .. code-block:: python
 
-    from datarefinery.tuple.TupleOperations import wrap, keep, substitution
-    from datarefinery.Tr import Tr
+    from datarefinery.TupleOperations import wrap, keep, substitution
+    from datarefinery.CombineOperations import parallel
 
     x2 = wrap(lambda x: x*2)
 
-    tr = Tr(keep(["name"])).then(substitution(["value"], x2))
-    operation = tr.apply()
-    (inp, res, err) = operation({"name": "John", "value": 10})
+    operation = parallel(keep(["name"]), substitution(["value"], x2))
+    (res, err) = operation({"name": "John", "value": 10})
     print(res) # {"name": "John", "value": 20}
 
-There are common mistakes as:
-- Add arguments to *apply*. This function only returns the complete function to use at the event.
-
-.. code-block:: python
-
-    from datarefinery.tuple.TupleOperations import substitution
-
-    tr = Tr(keep(["name"])).apply(substitution(["value"], x2)) # WRONG!!!
-
-- Use directly the function with parenthesis as argument (the argument is the function result without parameters):
-
-.. code-block:: python
-
-    from datarefinery.tuple.TupleOperations import substitution
-    from datarefinery.Tr import Tr
-
-    tr = Tr(keep(["name"])).then(substitution(["value"], x2())) # WRONG!!!
-
-In this case, we need a function as argument (the reference to the function).
-
-This should be carefully used, in Data Refinery some functions receives data parameters (as min_max_normalization) and
-returns a function as result and other (as explode_date) use functions as parameters.
 
 A world of possibilities
 ........................
 
-We can save our set of transformations every time we want using *Tr* object. This is very useful when you have training
-and production data.
+We can save our set of transformations every time we want becuase it's just a plain function.
 
 Training data is often as production data, but it contains an extra field called "label". This field indicates what
 machine learning model must learn.
@@ -650,88 +610,39 @@ Then we will add the label logic:
 
 .. code-block:: python
 
-    from datarefinery.tuple.TupleOperations import keep
+    from datarefinery.TupleOperations import keep
+    from datarefinery.CombineOperations import parallel
 
-    tr = etl()
+    op = etl()
     if training == True:
-        tr = tr.then(keep("label"))
-    operation = tr.apply()
+        operation = parallel(op, keep("label"))
+    else:
+        operation = op
 
 By this way, the output will contain the label without knowing other transformations over the data during training phase.
-
-Then - Adding new transformations
-.................................
-
-Data Refinery only works with Python dictionaries. So when data is not a dictionary, it's useful to use a data format
-operation before the event.
-*Tr* interface has a function to do this: *init*. This function takes the specified function and puts it at first on
-the group of event operations.
-
-At datarefinery.tuple.Formats module you can find several functions to transform different formats to Python
-dictionaries. In addition, there is a function *reader* to read the data. It's an alias for *init*.
-
-Note: if you want to use *init* with different *Tr* objects, be aware if this objects have the same origin, you
-will change both.
-
-**TODO: draw origin transformations**
-
-For example:
-
-.. code-block:: python
-
-    from datarefinery.tuple.TupleOperations import keep
-    from datarefinery.tuple.Formats import from_json
-
-    step1 = etl()
-    step2 = step1.then(keep("label"))
-    final = step2.init(from_json)
-
-In this case, step1 and step2 have *from_json* operation at beginning. If you want different starts for every step, then
-you can use the next code as example:
-
-.. code-block:: python
-
-    from datarefinery.tuple.TupleOperations import keep
-    from datarefinery.tuple.Formats import from_json
-
-    step1 = etl()
-    step2 = etl().then(keep("label"))
-    final = step2.init(from_json)
-
-Peek - Take a look at data
-..........................
-
-*peek* function works to read and handle data without any modification. You can use it when its needed to save data
-in a intermediate step without any transformation.
-
-Keep in mind *peek* is invoked when *apply* is. Furthermore, the execution of the complete process is synchronous. In
-other words, the process doesn't finish until *peek* doesn't finish (process continues even when *peek* fails).
-
-Note: *writer* method is an alias for *peek*.
 
 Sequentiality
 .............
 
-When you use *then* to create a group of operations, these are executed in one step. In other words, all operations use
+When you use parallel to create a group of operations, these are executed in one step. In other words, all operations use
 the same input and write in the same output. So, if we want to modify the value of a field which have been modified yet,
-even using *then*, all operations take place at the same time and we only see the last transformation.
+even using parallel, all operations take place at the same time and we only see the last transformation.
 
 For example:
 
 .. code-block:: python
 
-    from datarefinery.tuple.TupleOperations import wrap, substitution
-    from datarefinery.Tr import Tr
+    from datarefinery.TupleOperations import wrap, substitution
+    from datarefinery.CombineOperations import parallel
 
     x2 = wrap(lambda x: x*2)
 
-    tr = Tr(substitution("value", x2)).then(substitution("value", x2))
-    operation = tr.apply()
-    (inp, res, err) = operation({"value": 2})
+    operation = parallel(substitution(["value"], x2), substitution(["value"], x2))
+    (res, err) = operation({"value": 2})
     print(res) # {"value": 4}
 
-In this example, you expect output value will be 8, but it's not true. When operations run in parallel, the execution is
-something like this:
+In this example, you expect output value will be 8, but it's not true. When operations run in parallel, the
+execution is something like this:
 
 =========  ====================  ===================
   input      value (1st time)      value(2nd time)
@@ -746,50 +657,48 @@ operations run sequentially, as the next example:
 
 .. code-block:: python
 
-    from datarefinery.tuple.TupleOperations import wrap, substitution, compose
-    from datarefinery.Tr import Tr
+    from datarefinery.TupleOperations import wrap, substitution, compose
 
     x2 = wrap(lambda x: x*2)
 
-    tr = Tr(substitution("value", compose(x2,x2)))
-    operation = tr.apply()
-    (inp, res, err) = operation({"value": 2})
+    operation = substitution(["value"], compose(x2,x2))
+    (res, err) = operation({"value": 2})
     print(res) # {"value": 8}
 
-There is an alternative option for doing this. *change* is a function which uses the value of the output and substitutes
-the output with the result.
+
+Pandas use
+----------
+You can use Pandas Data Frame easily with this function:
 
 .. code-block:: python
 
-    from datarefinery.tuple.TupleOperations import wrap, substitution, change
-    from datarefinery.Tr import Tr
+    import pandas as pd
 
-    x2 = wrap(lambda x: x*2)
+    def pandas_dataframe_operator(df, operation):
+        if df is None or operation is None:
+            return None, None
+        raw_df = pd.DataFrame(df.apply(operation, axis=1), columns=["res"])
 
-    tr = Tr(substitution("value", x2)).then(change("value", x2))
-    operation = tr.apply()
-    (inp, res, err) = operation({"value": 2})
-    print(res) # {"value": 8}
+        raw_df['ok'] = raw_df["res"].apply(lambda x: x[0])
+        raw_df['ko'] = raw_df["res"].apply(lambda x: x[1])
 
-You can create your own operation using our DSL.
+        raw_df = pd.concat([df, raw_df[['ok', 'ko']]], axis=1)
 
-Other option is use *chain* function. This ends all operations before its execution and copy the output to the input.
-In other words, the original input disappears but you can propagate the error.
+        ok_filter = raw_df["ok"].apply(lambda x: x is not None)
+        ok_df = raw_df[ok_filter]
+        ok_df = pd.DataFrame(ok_df["ok"].apply(pd.Series))
+        ko_df = raw_df[~ok_filter]
+        ko_df = pd.concat([ko_df, pd.DataFrame(ko_df["ko"].apply(pd.Series))], axis=1)
+        del ko_df['ok']
+        del ko_df['ko']
 
-.. code-block:: python
+        return ok_df, ko_df
 
-    from datarefinery.tuple.TupleOperations import wrap, substitution, chain
-    from datarefinery.Tr import Tr
+This function expect a data frame and any tuple operation, and returns two data frames. One it's the correct tuples
+transformed, the other is the original data frame with error columns added, this way you can easily fix the tuple
+operation.
 
-    x2 = wrap(lambda x: x*2)
-
-    tr = Tr(substitution("value", x2)).then(chain).then(substitution("value", x2))
-    operation = tr.apply()
-    (inp, res, err) = operation({"value": 2})
-    print(res) # {"value": 8}
-
-Please, use *chain* as last option. It's a **very dangerous** operation, because it **loses the original input**.
-This means if you have to do operations with original input, you can't do it after *chain* operation.
+You can check the example of use in tests/examples.
 
 Review exercises
 ----------------

@@ -12,36 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import datetime
-
 from collections import OrderedDict
 from typing import Callable, TypeVar, Tuple, Optional, List, Union
-from datarefinery.tuple.TupleOperations import compose
+from datarefinery.TupleOperations import compose
+from datarefinery.tuple.TupleDSL import fixed_input
 
 T = TypeVar('T')
 U = TypeVar('U')
-
-
-def _fixed_input(return_value: U, error_text: str = "") \
-        -> Callable[[T], Tuple[Optional[U], Optional[str]]]:
-    """
-
-    Return a function that gives the value or the error supplied as parameter.
-
-    :param return_value: Any
-    :param error_text: str
-    :return: Callable
-    """
-    def _value(x, e=None):
-        return return_value, None
-
-    def _error(x, e=None):
-        return None, error_text
-
-    if return_value is not None:
-        return _value
-    else:
-        return _error
 
 
 def type_enforcer(enforcer_function: Callable[[T], U]) -> \
@@ -63,7 +40,7 @@ def type_enforcer(enforcer_function: Callable[[T], U]) -> \
             return None, "can't cast {} to enforced type {}".format(x, e)
 
     if enforcer_function is None:
-        return _fixed_input(None, "a enforcer function is required")
+        return fixed_input(None, "a enforcer function is required")
     return _app
 
 
@@ -86,11 +63,11 @@ def min_max_normalization(min_value: float, max_value: float) -> \
         return (x - min_value) / (max_value - min_value), None
 
     if min_value is None:
-        return _fixed_input(None, "Min value required")
+        return fixed_input(None, "Min value required")
     if max_value is None:
-        return _fixed_input(None, "Max value required")
+        return fixed_input(None, "Max value required")
     if max_value <= min_value:
-        return _fixed_input(None, "Min > Max")
+        return fixed_input(None, "Min > Max")
     return _app
 
 
@@ -112,11 +89,11 @@ def std_score_normalization(average: float, std_deviation: float) -> \
         return (x - average) / std_deviation, None
 
     if average is None:
-        return _fixed_input(None, "average is required")
+        return fixed_input(None, "average is required")
     if std_deviation is None:
-        return _fixed_input(None, "std deviation is required")
+        return fixed_input(None, "std deviation is required")
     if std_deviation == 0:
-        return _fixed_input(None, "std deviation must be != 0")
+        return fixed_input(None, "std deviation must be != 0")
     return _app
 
 
@@ -130,21 +107,21 @@ def buckets_grouping(*buckets: float) -> \
     :return: Callable
     """
 
-    def _app(x: float, e=None) -> Tuple[Optional[int], Optional[str]]:
+    def _app(x, e=None) -> Tuple[Optional[int], Optional[str]]:
         if x is None:
-            return None, None
+            return None, e
         for (lower, upper, index) in intervals:
             if lower is None and x <= upper:
-                return index, None
+                return index, e
             elif upper is None and lower < x:
-                return index, None
+                return index, e
             elif lower is not None and upper is not None and lower < x <= upper:
-                return index, None
+                return index, e
         return None, "bucket not found for {}".format(x)
 
     size = len(buckets)
     if size <= 0 or any([x is None for x in buckets]):
-        return _fixed_input(None, "buckets not provided")
+        return fixed_input(None, "buckets not provided")
     intervals = list(zip([None] + list(buckets), list(buckets) + [None], range(1, len(buckets) + 2)))
     return _app
 
@@ -168,7 +145,7 @@ def linear_category(categories: List[T]) -> \
         return category_map[x], None
 
     if categories is None or len(categories) == 0:
-        return _fixed_input(None, "no categories supplied")
+        return fixed_input(None, "no categories supplied")
     category_map = {value: i+1 for (i, value) in enumerate(categories)}
 
     return _app
@@ -194,7 +171,7 @@ def column_category(categories: List[T]) -> \
         return category_map, None
 
     if categories is None or len(categories) == 0:
-        return _fixed_input(None, "no categories supplied")
+        return fixed_input(None, "no categories supplied")
     return _app
 
 
@@ -210,7 +187,7 @@ def explode(prefix: str):
     """
     given an array of objects de-normalized into fields
     """
-    def _app(i, e):
+    def _app(i, e=None):
         if i is not None:
             return {k: v for (k, v) in iter_fields(i)}, None
         return i, e
@@ -231,7 +208,7 @@ def explode(prefix: str):
 
 
 def replace_if(func, replacement):
-    def _app(i, e):
+    def _app(i, e=None):
         if func(i):
             return replacement(i), e
         return i, e
@@ -239,69 +216,8 @@ def replace_if(func, replacement):
     return _app
 
 
-def date_parser(date_formats: list):
-    def _app(x: str, e=None):
-        if x is None:
-            return None, "Date can't be None: {}".format(x)
-        if date_formats is None:
-            return None, "Date formats can't be None"
-        for current_format in date_formats:
-            try:
-                d = datetime.datetime.strptime(x, current_format)
-                if d is not None:
-                    return d, None
-            except ValueError:
-                continue
-        return None, "Can not parse date {}".format(x)
-
-    return _app
-
-
-def time_parser(formats: list):
-    def _app(x: str, e=None):
-        if x is None:
-            return None, "Time can't be None: {}".format(x)
-        if formats is None:
-            return None, "Time formats can't be None"
-        for current_format in formats:
-            try:
-                d = datetime.datetime.strptime(x, current_format).time()
-                if d is not None:
-                    return d, None
-            except ValueError:
-                continue
-        return None, "Can not parse time {}".format(x)
-
-    return _app
-
-
-def explode_date(date: datetime.datetime, e):
-    if date is not None:
-        return {
-                   "year": date.year,
-                   "month": date.month,
-                   "day": date.day,
-                   "hour": date.hour,
-                   "minute": date.minute,
-                   "second": date.second
-               }, e
-    else:
-        return None, e
-
-
-def explode_time(time: datetime.time, e):
-    if time is not None:
-        return {
-                   "hour": time.hour,
-                   "minute": time.minute,
-                   "second": time.second
-               }, e
-    else:
-        return None, e
-
-
 def remove_columns(*columns_to_remove: str):
-    def _app(i, e):
+    def _app(i, e=None):
         if i is not None:
             out = {k: v for k, v in i.items() if k not in columns_to_remove}
             if len(out) == 0:
@@ -324,8 +240,10 @@ def match_dict(dictionary):
 
 
 def replace_if_else(fn_cond, fn_then, fn_else=lambda x: x):
-    def _app(i, e):
-        if fn_cond(i):
+    def _app(i, e=None):
+        if e is not None:
+            return None, e
+        elif fn_cond(i):
             return fn_then(i), e
         else:
             return fn_else(i), e
